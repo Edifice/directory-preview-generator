@@ -1,0 +1,32 @@
+{
+  "name": "directory-preview-generator",
+  "version": "0.0.1",
+  "description": "",
+  "main": "gulpfile.js",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "bower install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Edifice/directory-preview-generator.git"
+  },
+  "authors": [
+    "Daniel Salamon <salidani@gmail.com>"
+  ],
+  "license": "-",
+  "bugs": {
+    "url": "https://github.com/Edifice/directory-preview-generator/issues"
+  },
+  "homepage": "https://github.com/Edifice/directory-preview-generator#readme",
+  "dependencies": {
+    "del": "^2.2.0",
+    "gulp": "^3.9.1",
+    "gulp-coffee": "^2.3.1",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-stylus": "^2.3.0",
+    "gulp-util": "^3.0.7",
+    "gulp-watch": "^4.3.5"
+  }
+}

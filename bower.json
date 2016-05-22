@@ -1,0 +1,25 @@
+{
+  "name": "directory-preview-generator",
+  "version": "0.0.1",
+  "homepage": "https://github.com/Edifice/directory-preview-generator",
+  "authors": [
+    "Daniel Salamon <salidani@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "-",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "material-design-lite": "~1.1.3",
+    "normalize-css": "normalize.css#~4.1.1",
+    "jquery": "^2.2.4"
+  }
+}
