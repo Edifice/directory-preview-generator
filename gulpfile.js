@@ -1,4 +1,4 @@
-(function(){
+(function() {
     'use strict';
 
     var gulp = require('gulp'),
@@ -8,11 +8,11 @@
         gutil = require('gulp-util'),
         del = require('del');
 
-    gulp.task('clean', function (cb) {
-        del(['out/**'], cb);
+    gulp.task('clean', function() {
+        del.sync(['./out/**/*']);
     });
 
-    gulp.task('stylus', function () {
+    gulp.task('stylus', function() {
         return gulp.src('./src/style.styl')
             .pipe(sourcemaps.init())
             .pipe(stylus())
@@ -20,7 +20,7 @@
             .pipe(gulp.dest('./out'));
     });
 
-    gulp.task('coffee', function(){
+    gulp.task('coffee', function() {
         return gulp.src('./src/**/*.coffee')
             .pipe(sourcemaps.init())
             .pipe(coffee({
@@ -30,16 +30,26 @@
             .pipe(gulp.dest('./out'));
     });
 
-    gulp.task('index', [], function(){
+    gulp.task('index', [], function() {
         return gulp.src('./src/index.html')
             .pipe(gulp.dest('./out'));
     });
 
-    gulp.task('compile', ['stylus', 'index', 'coffee'], function(){
-        return ;
+    gulp.task('copyBower', function(){
+        return gulp.src('./bower_components/**/*.{js,css}')
+            .pipe(gulp.dest('./out/bower_components'));
     });
 
-    gulp.task('watch', ['compile'], function(){
+    gulp.task('assets', function(){
+        return gulp.src('./src/**/*.{json,jpg,png,svg}')
+            .pipe(gulp.dest('./out/'));
+    });
+
+    gulp.task('compile', ['clean', 'index', 'copyBower', 'stylus', 'coffee', 'assets'], function() {
+        return;
+    });
+
+    gulp.task('watch', ['compile'], function() {
         gulp.watch('./src/**/*.styl', ['stylus']);
         gulp.watch('./src/**/*.coffee', ['coffee']);
         gulp.watch('./src/index.html', ['index']);

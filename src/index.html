@@ -1,16 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="initial-scale=1">
-        <title>Magicblue Resources</title>
 
-        <link rel="stylesheet" href="../bower_components/normalize-css/normalize.css" charset="utf-8">
-        <link rel="stylesheet" href="style.css" charset="utf-8">
-    </head>
-    <body>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <title>Magicblue Resources</title>
 
-        <script type="text/javascript" src="../bower_components/jquery/dist/jquery.min.js"></script>
-        <script type="text/javascript" src="script.js"></script>
-    </body>
+    <link rel="stylesheet" href="bower_components/normalize-css/normalize.css" charset="utf-8">
+    <link rel="stylesheet" href="bower_components/material-design-lite/material.min.css" charset="utf-8">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="style.css" charset="utf-8">
+
+    <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="bower_components/material-design-lite/material.min.js"></script>
+</head>
+
+<body>
+    <!-- Always shows a header, even in smaller screens. -->
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+        <header class="mdl-layout__header">
+            <div class="mdl-layout__header-row">
+                <!-- Title -->
+                <span class="mdl-layout-title">Title</span>
+                <!-- Add spacer, to align navigation to the right -->
+                <div class="mdl-layout-spacer"></div>
+                <!-- Navigation. We hide it in small screens. -->
+                <nav class="mdl-navigation mdl-layout--large-screen-only">
+                    <a class="mdl-navigation__link" href="">Link</a>
+                    <a class="mdl-navigation__link" href="">Link</a>
+                    <a class="mdl-navigation__link" href="">Link</a>
+                    <a class="mdl-navigation__link" href="">Link</a>
+                </nav>
+            </div>
+        </header>
+        <div class="mdl-layout__drawer">
+            <span class="mdl-layout-title">Title</span>
+            <nav class="mdl-navigation">
+                <a class="mdl-navigation__link" href="">Link</a>
+                <a class="mdl-navigation__link" href="">Link</a>
+                <a class="mdl-navigation__link" href="">Link</a>
+                <a class="mdl-navigation__link" href="">Link</a>
+            </nav>
+        </div>
+        <main class="mdl-layout__content">
+            <div class="page-content">
+                <div class="mdl-card mdl-shadow--2dp">
+                    <div class="mdl-card__media" style="background-image: url('https://cnet1.cbsistatic.com/hub/i/r/2015/09/21/4813b2d7-3583-4a69-ab14-75fb862a026c/thumbnail/770x433/2ca0b10faaf8741bbadc90a6b761bf20/pebble-time-round-05.jpgg')"></div>
+                    <div class="mdl-card__supporting-text">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris sagittis pellentesque lacus eleifend lacinia...
+                    </div>
+                    <div class="mdl-card__menu">
+                        <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+                            <i class="material-icons">content_copy</i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+
+    <script type="text/javascript" src="script.js"></script>
+</body>
+
 </html>
