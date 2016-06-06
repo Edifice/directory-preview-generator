@@ -39,3 +39,4 @@ bower_*
 
 # Custom
 out
+.db
