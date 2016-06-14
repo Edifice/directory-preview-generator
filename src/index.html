@@ -8,11 +8,18 @@
 
     <link rel="stylesheet" href="bower_components/normalize-css/normalize.css" charset="utf-8">
     <link rel="stylesheet" href="bower_components/material-design-lite/material.min.css" charset="utf-8">
+    <link rel="stylesheet" href="bower_components/selectize/dist/css/selectize.default.css" charset="utf-8">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="style.css" charset="utf-8">
 
     <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
-    <script type="text/javascript" src="bower_components/material-design-lite/material.min.js"></script>
+    <script>
+        try {
+            $ = jQuery = module.exports;
+            // If you want module.exports to be empty, uncomment:
+            // module.exports = {};
+        } catch (e) {}
+    </script>
 </head>
 
 <body>
@@ -59,7 +66,71 @@
         </main>
     </div>
 
+    <button class="add-button mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+        <i class="material-icons">add</i>
+    </button>
 
+    <dialog id="add-dialog" class="mdl-dialog">
+        <h4 class="mdl-dialog__title">Add new stuff...</h4>
+        <div class="mdl-dialog__content">
+            <form action="#">
+                <div>
+                    <label for="add-dialog-file-input">The stuff itself</label>
+                    <div class="file-picker">
+                        <input type="hidden" id="add-dialog-file-input-hidden">
+                        <div class="mdl-textfield mdl-js-textfield">
+                            <input class="mdl-textfield__input" type="text" id="add-dialog-file-input" disabled>
+                        </div>
+                        <button class="mdl-button mdl-js-button mdl-button--raised">
+                            Pick file
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <label for="add-dialog-sample-input">The sample image for the stuff</label>
+                    <div class="file-picker">
+                        <input type="hidden" id="add-dialog-sample-input-hidden">
+                        <div class="mdl-textfield mdl-js-textfield">
+                            <input class="mdl-textfield__input" type="text" id="add-dialog-sample-input" disabled>
+                        </div>
+                        <button class="mdl-button mdl-js-button mdl-button--raised">
+                            Pick file
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <label for="add-dialog-category">Category</label>
+                    <select class="selectize" name="add-dialog-category" id="add-dialog-category">
+                        <option value="background">Background</option>
+                        <option value="brush">Brush</option>
+                        <option value="effect">Effect</option>
+                        <option value="element">Element</option>
+                        <option value="icon">Icon pack</option>
+                        <option value="mockup">Mockup / Scene</option>
+                        <option value="ready">Ready design template</option>
+                        <option value="texture">Texture</option>
+                        <option value="theme-pack">Theme based pack</option>
+                        <option value="tool">Tool</option>
+                        <option value="ui">UI</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="add-dialog-tags">Tags</label>
+                    <select class="selectize" name="add-dialog-tags" id="add-dialog-tags" multiple>
+                        <option value="test">test</option>
+                        <option value="test2">test2</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+        <div class="mdl-dialog__actions">
+            <button type="button" class="mdl-button mdl-button--colored add-confirm-button">Add</button>
+            <button type="button" class="mdl-button add-close-button">Cancel</button>
+        </div>
+    </dialog>
+
+    <script type="text/javascript" src="bower_components/material-design-lite/material.min.js"></script>
+    <script type="text/javascript" src="bower_components/selectize/dist/js/standalone/selectize.js"></script>
     <script type="text/javascript" src="script.js"></script>
 </body>
 

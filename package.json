@@ -30,6 +30,8 @@
     "gulp-stylus": "^2.3.0",
     "gulp-util": "^3.0.7",
     "gulp-watch": "^4.3.5",
+    "jimp": "^0.2.24",
+    "remote": "^0.2.6",
     "walk": "^2.3.9"
   }
 }

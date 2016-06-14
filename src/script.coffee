@@ -1,6 +1,5 @@
 'use strict'
 
-window.$ = window.jQuery = require('./bower_components/jquery/dist/jquery.min.js')
 electron = require('electron')
 fs = require('fs')
 path = require('path')
@@ -36,7 +35,37 @@ collectData = ->
         tags: ['mockup', 'device', 'phone', 'nexus']
     ]
 
-console.log data = collectData()
+data = collectData()
+events = {}
 
-$ ->
-    console.log __dirname
+
+$(document).ready ->
+    $('.add-button').on 'click', (event)->
+        event.preventDefault()
+        document.querySelector('#add-dialog').showModal()
+        @
+
+    $('#add-dialog button.add-confirm-button').on 'click', ->
+        @
+
+    $('#add-dialog button.add-close-button').on 'click', ->
+        $('#add-dialog form')[0].reset()
+        $('#add-dialog')[0].close()
+        @
+
+    $('.file-picker button').bind 'click', (event)->
+        filePath = electron.remote.dialog.showOpenDialog()
+        filePath = filePath[0] if $.isArray filePath
+        $('input[type=hidden]', $(this).parent()).val(filePath)
+        $('input[type=text]', $(this).parent()).val(filePath.substr(filePath.lastIndexOf(path.sep) + 1)).parent().addClass('is-dirty')
+        @
+
+    $('select.selectize').selectize
+        plugins: ['restore_on_backspace', 'remove_button']
+        delimiter: ','
+        persist: false
+        create: (input) ->
+            value: input
+            text: input
+
+    @
