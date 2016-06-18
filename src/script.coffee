@@ -62,6 +62,8 @@ updateList = ->
     container = $('.page-content').html('')
     for file in data
         templateData =
+            path: path.resolve file.file.path.replace('..' + path.sep, '')
+            ino: file.file.ino
             background: ('..' + path.sep + file.sample).replace(/\\/g, '/')
             tags: ''
 
@@ -75,14 +77,32 @@ updateList = ->
                     #{templateData.tags}
                 </div>
                 <div class="mdl-card__menu">
-                    <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
-                        <i class="material-icons">content_copy</i>
+                    <button class="mdl-button mdl-button--icon mdl-js-button" id="add-dialog-context-menu-#{templateData.ino}">
+                        <i class="material-icons">more_vert</i>
                     </button>
+                    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="add-dialog-context-menu-#{templateData.ino}">
+                        <li class="mdl-menu__item add-dialog-context-menu" data-path="#{templateData.path}" data-method="open-file">Open file</li>
+                        <li class="mdl-menu__item add-dialog-context-menu" data-path="#{templateData.path}" data-method="open-location">Open file location</li>
+                        <li class="mdl-menu__item add-dialog-context-menu" data-path="#{templateData.path}" data-method="copy-path">Copy path</li>
+                    </ul>
                 </div>
             </div>
         """
 
         container.append(template)
+
+        $('#add-dialog-context-menu-' + templateData.ino + '+ul>.add-dialog-context-menu').on 'click', ->
+            filePath = $(this).data('path')
+            switch $(this).data('method')
+                when 'open-file'
+                    electron.shell.openItem filePath
+                when 'open-location'
+                    electron.shell.showItemInFolder filePath
+                when 'copy-path'
+                    electron.clipboard.writeText filePath
+                    document.querySelector('#toast').MaterialSnackbar.showSnackbar
+                        message: 'Path copied to clipboard'
+    @
 
 initSelectize = ->
     $('select.selectize').selectize
@@ -140,7 +160,7 @@ $(document).ready ->
         $('#add-dialog')[0].close()
         appendData newFile
         setTimeout 1000, updateList
-    @
+        @
 
     $('#add-dialog button.add-close-button').on 'click', ->
         $('#add-dialog form')[0].reset()
