@@ -10,7 +10,18 @@ config = {}
 config.dbPath = __dirname + path.sep + '..' + path.sep + '.db'
 config.dbDataPath = config.dbPath + path.sep + 'generator.json'
 config.rootPath = __dirname.substr(0, __dirname.lastIndexOf(path.sep)) + path.sep + 'testStructure'
-
+config.categories =
+    'background': 'Background'
+    'brush': 'Brush'
+    'effect': 'Effect'
+    'element': 'Element'
+    'icon': 'Icon pack'
+    'mockup': 'Mockup / Scene'
+    'ready': 'Ready design template'
+    'texture': 'Texture'
+    'theme-pack': 'Theme based pack'
+    'tool': 'Tool'
+    'ui': 'UI'
 
 collectData = ->
     try
@@ -31,6 +42,10 @@ countTags = (files)->
             tags[tag] += 1
             @
         @
+
+    $('.mdl-layout__drawer nav a').remove()
+    for tag, count of tags
+        $('.mdl-layout__drawer nav').append("<a class='mdl-navigation__link' href=''>#{tag} <small>(#{count})</small></a>")
     tags
 
 appendData = (newFile)->
@@ -44,6 +59,7 @@ writeData = (data)->
 updateList = ->
     data = collectData()
     tags = countTags(data)
+    container = $('.page-content').html('')
     for file in data
         templateData =
             background: ('..' + path.sep + file.sample).replace(/\\/g, '/')
@@ -66,11 +82,32 @@ updateList = ->
             </div>
         """
 
-        $('.page-content').append(template)
+        container.append(template)
+
+initSelectize = ->
+    $('select.selectize').selectize
+        plugins: ['restore_on_backspace', 'remove_button']
+        delimiter: ','
+        persist: false
+        create: (input) ->
+            value: input
+            text: input
 
 $(document).ready ->
+    # set categories
+    $('#add-dialog-category option').remove()
+    $('.mdl-layout__header nav a').remove()
+    for cat, text of config.categories
+        $('#add-dialog-category').append("<option value='#{cat}'>#{text}</option>")
+        $('.mdl-layout__header nav').append("<a class='mdl-navigation__link' href=''>#{text}</a>")
+
     $('.add-button').on 'click', (event)->
         event.preventDefault()
+        select = $('#add-dialog-tags')
+        $('option', select).remove()
+        for tag, count of countTags(collectData())
+            select.append('<option value="' + tag + '">' + tag + '</option>')
+        initSelectize()
         document.querySelector('#add-dialog').showModal()
         @
 
@@ -79,6 +116,7 @@ $(document).ready ->
         filePath = _.find(serialized, ['name', 'add-dialog-file-input-hidden']).value
         fileStats = fs.statSync(filePath)
         newFile =
+            recordDate: +new Date()
             file:
                 path: path.relative __dirname, filePath
                 ino: fileStats.ino
@@ -101,7 +139,7 @@ $(document).ready ->
         $('#add-dialog form')[0].reset()
         $('#add-dialog')[0].close()
         appendData newFile
-        updateList()
+        setTimeout 1000, updateList
     @
 
     $('#add-dialog button.add-close-button').on 'click', ->
@@ -116,14 +154,6 @@ $(document).ready ->
         $('input[type=hidden]', $(this).parent()).val(filePath)
         $('input[type=text]', $(this).parent()).val(filePath.substr(filePath.lastIndexOf(path.sep) + 1)).parent().addClass('is-dirty')
         false
-
-    $('select.selectize').selectize
-        plugins: ['restore_on_backspace', 'remove_button']
-        delimiter: ','
-        persist: false
-        create: (input) ->
-            value: input
-            text: input
 
     updateList()
 

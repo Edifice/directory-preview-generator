@@ -24,30 +24,15 @@
 
 <body>
     <!-- Always shows a header, even in smaller screens. -->
-    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header mdl-layout--fixed-drawer">
         <header class="mdl-layout__header">
             <div class="mdl-layout__header-row">
-                <!-- Title -->
-                <span class="mdl-layout-title">Title</span>
-                <!-- Add spacer, to align navigation to the right -->
-                <div class="mdl-layout-spacer"></div>
-                <!-- Navigation. We hide it in small screens. -->
-                <nav class="mdl-navigation mdl-layout--large-screen-only">
-                    <a class="mdl-navigation__link" href="">Link</a>
-                    <a class="mdl-navigation__link" href="">Link</a>
-                    <a class="mdl-navigation__link" href="">Link</a>
-                    <a class="mdl-navigation__link" href="">Link</a>
-                </nav>
+                <nav class="mdl-navigation mdl-layout--large-screen-only"></nav>
             </div>
         </header>
         <div class="mdl-layout__drawer">
-            <span class="mdl-layout-title">Title</span>
-            <nav class="mdl-navigation">
-                <a class="mdl-navigation__link" href="">Link</a>
-                <a class="mdl-navigation__link" href="">Link</a>
-                <a class="mdl-navigation__link" href="">Link</a>
-                <a class="mdl-navigation__link" href="">Link</a>
-            </nav>
+            <span class="mdl-layout-title">Design resources</span>
+            <nav class="mdl-navigation"></nav>
         </div>
         <main class="mdl-layout__content">
             <div class="page-content"></div>
@@ -88,26 +73,11 @@
                 </div>
                 <div>
                     <label for="add-dialog-category">Category</label>
-                    <select class="selectize" name="add-dialog-category" id="add-dialog-category">
-                        <option value="background">Background</option>
-                        <option value="brush">Brush</option>
-                        <option value="effect">Effect</option>
-                        <option value="element">Element</option>
-                        <option value="icon">Icon pack</option>
-                        <option value="mockup">Mockup / Scene</option>
-                        <option value="ready">Ready design template</option>
-                        <option value="texture">Texture</option>
-                        <option value="theme-pack">Theme based pack</option>
-                        <option value="tool">Tool</option>
-                        <option value="ui">UI</option>
-                    </select>
+                    <select class="selectize" name="add-dialog-category" id="add-dialog-category"></select>
                 </div>
                 <div>
                     <label for="add-dialog-tags">Tags</label>
-                    <select class="selectize" name="add-dialog-tags" id="add-dialog-tags" multiple>
-                        <option value="test">test</option>
-                        <option value="test2">test2</option>
-                    </select>
+                    <select class="selectize" name="add-dialog-tags" id="add-dialog-tags" multiple></select>
                 </div>
             </form>
         </div>
