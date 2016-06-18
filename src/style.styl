@@ -2,12 +2,35 @@
     padding 20px
 
 .mdl-card
-    width 400px
-    height @width
+    width 300px
 
 .mdl-card__media
     height 300px
-    width 100%
+    width @height
+    background-size contain
+    background-repeat no-repeat
+    background-color white
+
+.mdl-card__supporting-text
+    padding-bottom 2px
+
+.mdl-badge
+    background #3F51B5
+    padding 5px 12px
+    border-radius 4px
+    color white
+    background #3f51b5
+    float left
+    margin-bottom 12px
+    margin-right @margin-bottom
+    &[data-badge]:after
+        top -10px
+        right -8px
+        font-size 10px
+        width auto
+        height 18px
+        padding 0 6px
+        border-radius 10px
 
 .add-button
     position absolute

@@ -4,12 +4,12 @@ electron = require('electron')
 fs = require('fs')
 path = require('path')
 _ = require('lodash')
+jimp = require('jimp')
 
 config = {}
 config.dbPath = __dirname + path.sep + '..' + path.sep + '.db'
 config.dbDataPath = config.dbPath + path.sep + 'generator.json'
 config.rootPath = __dirname.substr(0, __dirname.lastIndexOf(path.sep)) + path.sep + 'testStructure'
-
 
 
 collectData = ->
@@ -22,16 +22,51 @@ collectData = ->
 
     JSON.parse(fs.readFileSync(config.dbDataPath)).files || []
 
-appendData = (newFile)->
-    data.push(newFile)
-    writeData()
+countTags = (files)->
+    tags = {}
+    files.forEach (file)->
+        file.tags.forEach (tag)->
+            if typeof tags[tag] isnt 'number'
+                tags[tag] = 0
+            tags[tag] += 1
+            @
+        @
+    tags
 
-writeData = ->
+appendData = (newFile)->
+    currentFiles = collectData()
+    currentFiles.push(newFile)
+    writeData(currentFiles)
+
+writeData = (data)->
     fs.writeFileSync(config.dbDataPath, JSON.stringify({files: data}))
 
-data = collectData()
-events = {}
+updateList = ->
+    data = collectData()
+    tags = countTags(data)
+    for file in data
+        templateData =
+            background: ('..' + path.sep + file.sample).replace(/\\/g, '/')
+            tags: ''
 
+        file.tags.forEach (tag)->
+            templateData.tags += '<span class="mdl-badge" data-badge="' + tags[tag] + '">' + tag + '</span>'
+
+        template = """
+            <div class="mdl-card mdl-shadow--2dp">
+                <div class="mdl-card__media" style="background-image: url('#{templateData.background}')"></div>
+                <div class="mdl-card__supporting-text">
+                    #{templateData.tags}
+                </div>
+                <div class="mdl-card__menu">
+                    <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+                        <i class="material-icons">content_copy</i>
+                    </button>
+                </div>
+            </div>
+        """
+
+        $('.page-content').append(template)
 
 $(document).ready ->
     $('.add-button').on 'click', (event)->
@@ -48,16 +83,26 @@ $(document).ready ->
                 path: path.relative __dirname, filePath
                 ino: fileStats.ino
                 size: fileStats.size
-            sample: path.relative __dirname, _.find(serialized, ['name', 'add-dialog-sample-input-hidden']).value
             category: _.find(serialized, ['name', 'add-dialog-category']).value
-            tags:serialized.filter (elem)->
+            tags: serialized.filter (elem)->
                 elem.name is 'add-dialog-tags'
             .map (elem)->
                 elem.value
+        newFile.sample = path.relative __dirname + path.sep + '..', config.dbPath + path.sep + newFile.file.ino + '.png'
+
+        samplePath = _.find(serialized, ['name', 'add-dialog-sample-input-hidden']).value
+        jimp.read samplePath, (err, img)->
+            throw err if err
+            img.contain(300, 300)
+                .quality(80)
+                .write(newFile.sample)
+            console.log newFile.sample + ' converted from "' + samplePath + '" and saved'
 
         $('#add-dialog form')[0].reset()
         $('#add-dialog')[0].close()
         appendData newFile
+        updateList()
+    @
 
     $('#add-dialog button.add-close-button').on 'click', ->
         $('#add-dialog form')[0].reset()
@@ -79,5 +124,7 @@ $(document).ready ->
         create: (input) ->
             value: input
             text: input
+
+    updateList()
 
     @
