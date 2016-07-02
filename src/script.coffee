@@ -55,7 +55,7 @@ setTags = ->
     $('.mdl-layout__drawer .drawer-tag-item').remove()
     for tag, count of config.tags
         tag_safe = tag.safe()
-        $('.mdl-layout__drawer .drawer-tag-header').after """
+        $('.mdl-layout__drawer .drawer-tag-all').after """
             <li class="mdl-list__item drawer-tag-item" data-tag="#{tag}">
                 <span class="mdl-list__item-primary-content" id="tag-filter-#{tag_safe}">
                     #{tag}<small>(#{count})</small>
@@ -274,6 +274,14 @@ $(document).ready ->
     $('a[href="#"]').on 'click', (e)->
         e.preventDefault()
         false
+
+    $('.drawer-tag-all a').on 'click', (e)->
+        config.filter.tags = Object.keys(config.tags)
+        $('label[for^=tag-switch]').each ->
+            if not $(@).hasClass('is-checked')
+                $(@).trigger('click')
+        updateList()
+        @
 
     updateList()
     setTags()
