@@ -105,56 +105,66 @@ writeData = (data)->
 updateList = ->
     data = collectData()
     countTags(data)
-    container = $('.page-content').html('')
-    filteredData = data.filter (file)->
-        console.log _.intersection(config.filter.tags, file.tags)
+    filteredInoList = data.filter (file)->
         (config.filter.categories.indexOf(file.category) > -1) and _.intersection(config.filter.tags, file.tags).length
+    .map (file)->
+        file.file.ino
 
-    console.log filteredData
-
-    for file in filteredData
-        templateData =
-            path: path.resolve file.file.path.replace('..' + path.sep, '')
-            ino: file.file.ino
-            background: ('..' + path.sep + file.sample).replace(/\\/g, '/')
-            tags: ''
-
-        file.tags.forEach (tag)->
-            templateData.tags += '<span class="mdl-badge" data-badge="' + config.tags[tag] + '">' + tag + '</span>'
-
-        template = """
-            <div class="mdl-card mdl-shadow--2dp">
-                <div class="mdl-card__media" style="background-image: url('#{templateData.background}')"></div>
-                <div class="mdl-card__supporting-text">
-                    #{templateData.tags}
-                </div>
-                <div class="mdl-card__menu">
-                    <button class="mdl-button mdl-button--icon mdl-js-button" id="add-dialog-context-menu-#{templateData.ino}">
-                        <i class="material-icons">more_vert</i>
-                    </button>
-                    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="add-dialog-context-menu-#{templateData.ino}">
-                        <li class="mdl-menu__item add-dialog-context-menu" data-path="#{templateData.path}" data-method="open-file">Open file</li>
-                        <li class="mdl-menu__item add-dialog-context-menu" data-path="#{templateData.path}" data-method="open-location">Open file location</li>
-                        <li class="mdl-menu__item add-dialog-context-menu" data-path="#{templateData.path}" data-method="copy-path">Copy path</li>
-                    </ul>
-                </div>
-            </div>
-        """
-
-        container.append(template)
-
-        $('#add-dialog-context-menu-' + templateData.ino + '+ul>.add-dialog-context-menu').on 'click', ->
-            filePath = $(this).data('path')
-            switch $(this).data('method')
-                when 'open-file'
-                    electron.shell.openItem filePath
-                when 'open-location'
-                    electron.shell.showItemInFolder filePath
-                when 'copy-path'
-                    electron.clipboard.writeText filePath
-                    document.querySelector('#toast').MaterialSnackbar.showSnackbar
-                        message: 'Path copied to clipboard'
+    for c in $('.page-content .mdl-card')
+        card = $(c)
+        if filteredInoList.indexOf(card.data('ino')) > -1
+            card.show(300)
+        else
+            card.hide(300)
     @
+
+addFileToList = (file)->
+    templateData =
+        path: path.resolve file.file.path.replace('..' + path.sep, '')
+        ino: file.file.ino
+        background: ('..' + path.sep + file.sample).replace(/\\/g, '/')
+        tags: ''
+
+    file.tags.forEach (tag)->
+        templateData.tags += '<span class="mdl-badge" data-badge="' + config.tags[tag] + '">' + tag + '</span>'
+
+    template = """
+        <div class="mdl-card mdl-shadow--2dp" data-ino="#{templateData.ino}">
+            <div class="mdl-card__media" style="background-image: url('#{templateData.background}')"></div>
+            <div class="mdl-card__supporting-text">
+                #{templateData.tags}
+            </div>
+            <div class="mdl-card__menu">
+                <button class="mdl-button mdl-button--icon mdl-js-button" id="add-dialog-context-menu-#{templateData.ino}">
+                    <i class="material-icons">more_vert</i>
+                </button>
+                <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="add-dialog-context-menu-#{templateData.ino}">
+                    <li class="mdl-menu__item add-dialog-context-menu" data-path="#{templateData.path}" data-method="open-file">Open file</li>
+                    <li class="mdl-menu__item add-dialog-context-menu" data-path="#{templateData.path}" data-method="open-location">Open file location</li>
+                    <li class="mdl-menu__item add-dialog-context-menu" data-path="#{templateData.path}" data-method="copy-path">Copy path</li>
+                </ul>
+            </div>
+        </div>
+    """
+
+    $('.page-content').append(template)
+
+    $('#add-dialog-context-menu-' + templateData.ino + '+ul>.add-dialog-context-menu').on 'click', ->
+        filePath = $(this).data('path')
+        switch $(this).data('method')
+            when 'open-file'
+                electron.shell.openItem filePath
+                toast 'File opened'
+            when 'open-location'
+                electron.shell.showItemInFolder filePath
+                toast 'File location opened'
+            when 'copy-path'
+                electron.clipboard.writeText filePath
+                toast 'Path copied to clipboard'
+
+toast = (msg)->
+    document.querySelector('#toast').MaterialSnackbar.showSnackbar
+        message: msg
 
 initSelectize = ->
     $('select.selectize').selectize
@@ -283,9 +293,10 @@ $(document).ready ->
         updateList()
         @
 
-    updateList()
+    # init files
+    data = collectData()
+    config.filter.tags = Object.keys(countTags(data))
+    addFileToList(file) for file in data
     setTags()
-    config.filter.tags = Object.keys(config.tags)
-    updateList()
 
     @
