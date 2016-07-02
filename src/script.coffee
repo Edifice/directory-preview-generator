@@ -38,7 +38,7 @@ collectData = ->
         # create db json file if it doesn't exist
         fs.writeFileSync config.dbDataPath, JSON.stringify {}
 
-    JSON.parse(fs.readFileSync(config.dbDataPath)).files || []
+    _.sortBy((JSON.parse(fs.readFileSync(config.dbDataPath)).files || []), (f)-> f.file.ino)
 
 countTags = (files)->
     tags = {}
@@ -165,13 +165,13 @@ addFileToList = (file)->
             when 'remove-file'
                 ino = $(@).data('ino')
                 data = collectData()
-                filter = (f)->
-                    f.file.ino is ino
+                filter = (f)-> f.file.ino is ino
                 deletedItem = _.find data, filter
                 undoHandler = ->
-                    appendData deletedItem
-                    updateList()
-                    toast 'File restored'
+                    if not _.find(collectData(), (f)-> f.file.ino is deletedItem.file.ino)
+                        appendData deletedItem
+                        updateList()
+                        toast 'File restored'
                 writeData _.reject data, filter
                 updateList()
                 toast 'File deleted from the list', undoHandler
