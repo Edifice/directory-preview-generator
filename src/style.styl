@@ -1,3 +1,27 @@
+drawer-width = 360px
+
+.mdl-layout__drawer
+    width drawer-width
+    .mdl-navigation
+        padding-top 0
+        ul
+            margin-top 0
+
+.mdl-layout--fixed-drawer
+    &.is-upgraded:not(.is-small-screen)>.mdl-layout__header
+        margin-left drawer-width
+        width "calc(100% - %s)" % drawer-width
+    &>.mdl-layout__content
+        margin-left drawer-width
+    .mdl-list__item
+        padding 0 16px 0 0
+        min-height 30px
+        h2
+            font-size 1.8em
+        .mdl-list__item-primary-content
+            outline none
+            cursor pointer
+
 .page-content
     display flex
     flex-wrap wrap

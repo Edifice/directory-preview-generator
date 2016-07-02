@@ -22,6 +22,13 @@ config.categories =
     'theme-pack': 'Theme based pack'
     'tool': 'Tool'
     'ui': 'UI'
+config.tags = []
+config.filter =
+    categories: Object.keys(config.categories)
+    tags: []
+
+String::safe = ->
+    @.replace(/\s/g, '_')
 
 collectData = ->
     try
@@ -42,11 +49,50 @@ countTags = (files)->
             tags[tag] += 1
             @
         @
+    config.tags = tags
 
-    $('.mdl-layout__drawer nav a').remove()
-    for tag, count of tags
-        $('.mdl-layout__drawer nav').append("<a class='mdl-navigation__link' href=''>#{tag} <small>(#{count})</small></a>")
-    tags
+setTags = ->
+    $('.mdl-layout__drawer .drawer-tag-item').remove()
+    for tag, count of config.tags
+        tag_safe = tag.safe()
+        $('.mdl-layout__drawer .drawer-tag-header').after """
+            <li class="mdl-list__item drawer-tag-item" data-tag="#{tag}">
+                <span class="mdl-list__item-primary-content" id="tag-filter-#{tag_safe}">
+                    #{tag}<small>(#{count})</small>
+                </span>
+                <div class="mdl-tooltip" for="tag-filter-#{tag_safe}">
+                    Show only: #{tag}
+                </div>
+                <span class="mdl-list__item-secondary-action">
+                    <label class="mdl-switch mdl-js-switch" for="tag-switch-#{tag_safe}">
+                        <input type="checkbox" id="tag-switch-#{tag_safe}" class="mdl-switch__input" checked />
+                    </label>
+                </span>
+            </li>
+        """
+
+        $("#tag-filter-#{tag_safe}").on 'click', (event)->
+            _tag = $(@).parent('li').data('tag')
+
+            $('label[for^=tag-switch]').each ->
+                newState = $(@).parents('li').data('tag') is _tag
+                isChecked = $(@).hasClass('is-checked')
+                if (isChecked and !newState) or (!isChecked and newState)
+                    $(@).trigger('click')
+            config.filter.tags = [_tag]
+            updateList()
+            @
+
+        $("#tag-switch-#{tag_safe}").on 'click', (event)->
+            _tag = $(@).parents('li').data('tag')
+
+            if $(@).prop('checked')
+                config.filter.tags.push(_tag)
+            else
+                _.pull(config.filter.tags, _tag)
+            updateList()
+            @
+    @
 
 appendData = (newFile)->
     currentFiles = collectData()
@@ -58,9 +104,15 @@ writeData = (data)->
 
 updateList = ->
     data = collectData()
-    tags = countTags(data)
+    countTags(data)
     container = $('.page-content').html('')
-    for file in data
+    filteredData = data.filter (file)->
+        console.log _.intersection(config.filter.tags, file.tags)
+        (config.filter.categories.indexOf(file.category) > -1) and _.intersection(config.filter.tags, file.tags).length
+
+    console.log filteredData
+
+    for file in filteredData
         templateData =
             path: path.resolve file.file.path.replace('..' + path.sep, '')
             ino: file.file.ino
@@ -68,7 +120,7 @@ updateList = ->
             tags: ''
 
         file.tags.forEach (tag)->
-            templateData.tags += '<span class="mdl-badge" data-badge="' + tags[tag] + '">' + tag + '</span>'
+            templateData.tags += '<span class="mdl-badge" data-badge="' + config.tags[tag] + '">' + tag + '</span>'
 
         template = """
             <div class="mdl-card mdl-shadow--2dp">
@@ -115,11 +167,55 @@ initSelectize = ->
 
 $(document).ready ->
     # set categories
-    $('#add-dialog-category option').remove()
-    $('.mdl-layout__header nav a').remove()
     for cat, text of config.categories
         $('#add-dialog-category').append("<option value='#{cat}'>#{text}</option>")
-        $('.mdl-layout__header nav').append("<a class='mdl-navigation__link' href=''>#{text}</a>")
+        #"<a class='mdl-navigation__link' href='#' data-category='#{cat}'>#{text}</a>")
+        $('.mdl-layout__drawer .drawer-category-header').after """
+            <li class="mdl-list__item drawer-category-item" data-category="#{cat}">
+                <span class="mdl-list__item-primary-content" id="category-filter-#{cat}">
+                    #{text}
+                </span>
+                <div class="mdl-tooltip" for="category-filter-#{cat}">
+                    Show only: #{text}
+                </div>
+                <span class="mdl-list__item-secondary-action">
+                    <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="category-switch-#{cat}">
+                        <input type="checkbox" id="category-switch-#{cat}" class="mdl-switch__input" checked />
+                    </label>
+                </span>
+            </li>
+        """
+
+        $("#category-filter-#{cat}").on 'click', (event)->
+            _category = $(@).parent('li').data('category')
+
+            $('label[for^=category-switch]').each ->
+                newState = $(@).parents('li').data('category') is _category
+                isChecked = $(@).hasClass('is-checked')
+                if (isChecked and !newState) or (!isChecked and newState)
+                    $(@).trigger('click')
+            config.filter.categories = [_category]
+            updateList()
+            @
+
+        $("#category-switch-#{cat}").on 'click', (event)->
+            _category = $(@).parents('li').data('category')
+
+            if $(@).prop('checked')
+                config.filter.categories.push(_category)
+            else
+                _.pull(config.filter.categories, _category)
+            updateList()
+            @
+
+    $('a[data-category]').on 'click', (event)->
+        cat = $(this).data('category')
+        if (indexOfCategory = config.filter.categories.indexOf(cat)) > -1
+            config.filter.categories.splice(indexOfCategory, 1)
+        else
+            config.filter.categories.push cat
+        console.log config.filter.categories
+        updateList()
 
     $('.add-button').on 'click', (event)->
         event.preventDefault()
@@ -145,7 +241,7 @@ $(document).ready ->
             tags: serialized.filter (elem)->
                 elem.name is 'add-dialog-tags'
             .map (elem)->
-                elem.value
+                _.deburr elem.value
         newFile.sample = path.relative __dirname + path.sep + '..', config.dbPath + path.sep + newFile.file.ino + '.png'
 
         samplePath = _.find(serialized, ['name', 'add-dialog-sample-input-hidden']).value
@@ -175,6 +271,13 @@ $(document).ready ->
         $('input[type=text]', $(this).parent()).val(filePath.substr(filePath.lastIndexOf(path.sep) + 1)).parent().addClass('is-dirty')
         false
 
+    $('a[href="#"]').on 'click', (e)->
+        e.preventDefault()
+        false
+
+    updateList()
+    setTags()
+    config.filter.tags = Object.keys(config.tags)
     updateList()
 
     @
