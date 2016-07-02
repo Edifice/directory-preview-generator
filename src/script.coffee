@@ -141,7 +141,8 @@ addFileToList = (file)->
                 <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="add-dialog-context-menu-#{templateData.ino}">
                     <li class="mdl-menu__item add-dialog-context-menu" data-path="#{templateData.path}" data-method="open-file">Open file</li>
                     <li class="mdl-menu__item add-dialog-context-menu" data-path="#{templateData.path}" data-method="open-location">Open file location</li>
-                    <li class="mdl-menu__item add-dialog-context-menu" data-path="#{templateData.path}" data-method="copy-path">Copy path</li>
+                    <li class="mdl-menu__item add-dialog-context-menu mdl-menu__item--full-bleed-divider" data-path="#{templateData.path}" data-method="copy-path">Copy path</li>
+                    <li class="mdl-menu__item add-dialog-context-menu mdl-button--accent" data-ino="#{templateData.ino}" data-method="remove-file">Delete this item</li>
                 </ul>
             </div>
         </div>
@@ -161,10 +162,31 @@ addFileToList = (file)->
             when 'copy-path'
                 electron.clipboard.writeText filePath
                 toast 'Path copied to clipboard'
+            when 'remove-file'
+                ino = $(@).data('ino')
+                data = collectData()
+                filter = (f)->
+                    f.file.ino is ino
+                deletedItem = _.find data, filter
+                undoHandler = ->
+                    appendData deletedItem
+                    updateList()
+                    toast 'File restored'
+                writeData _.reject data, filter
+                updateList()
+                toast 'File deleted from the list', undoHandler
 
-toast = (msg)->
-    document.querySelector('#toast').MaterialSnackbar.showSnackbar
-        message: msg
+toast = (msg, handler, handlerText='Undo')->
+    data =
+        if _.isFunction handler
+            message: msg
+            timeout: 5000
+            actionHandler: handler
+            actionText: handlerText
+        else
+            message: msg
+    document.querySelector('#toast').MaterialSnackbar.showSnackbar data
+    @
 
 initSelectize = ->
     $('select.selectize').selectize
